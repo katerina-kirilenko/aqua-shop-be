@@ -1,0 +1,44 @@
+[
+  {
+    "description": "Short Description about Corydoras Panda",
+    "id": "7567ec4b-b10c-48c5-9345-fc73c48a80aa",
+    "price": 24,
+    "title": "Corydoras Panda",
+    "image": "Corydoras_Panda.jpg"
+  },
+  {
+    "description": "Short Description about Ancistrus LDA016",
+    "id": "7567ec4b-b10c-48c5-9345-fc73c48a80a1",
+    "price": 15,
+    "title": "Ancistrus LDA016",
+    "image": "Ancistrus_LDA016.jpg"
+  },
+  {
+    "description": "Short Description about Black Mollies",
+    "id": "7567ec4b-b10c-48c5-9345-fc73c48a80a3",
+    "price": 23,
+    "title": "Black Mollies",
+    "image": "Black_Mollies.jpg"
+  },
+  {
+    "description": "Short Description about Koi Santa Claus Swordtail",
+    "id": "7567ec4b-b10c-48c5-9345-fc73348a80a1",
+    "price": 15,
+    "title": "Koi Santa Claus Swordtail",
+    "image": "Koi_Santa_Claus_Swordtail.jpg"
+  },
+  {
+    "description": "Short Description about Red Mosaic Dumbo Guppy",
+    "id": "7567ec4b-b10c-48c5-9445-fc73c48a80a2",
+    "price": 23,
+    "title": "Red Mosaic Dumbo Guppy",
+    "image": "Red_Mosaic_Dumbo_Guppy.jpg"
+  },
+  {
+    "description": "Short Description about Tiger Swordtail",
+    "id": "7567ec4b-b10c-45c5-9345-fc73c48a80a1",
+    "price": 15,
+    "title": "Tiger Swordtail",
+    "image": "Tiger_Swordtail.jpg"
+  }
+]
