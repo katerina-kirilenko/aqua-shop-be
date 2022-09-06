@@ -1,2 +1,2 @@
-# aqua-shop-be
-Aquarium Shop
+# Aquashop [Back-end]
+This is a mono repository for functions and services
