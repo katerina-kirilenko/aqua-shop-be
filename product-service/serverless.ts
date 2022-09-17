@@ -1,12 +1,10 @@
 import type { AWS } from '@serverless/typescript';
-
-import getProductsList from "@functions/getProductsList";
-import getProduct from "@functions/getProductsById";
+import { createProduct, getProduct, getAllProducts } from '@functions/index';
 
 const serverlessConfiguration: AWS = {
   service: 'product-service',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild'],
+  plugins: ['serverless-esbuild', 'serverless-offline', 'serverless-dynamodb-local'],
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
@@ -19,10 +17,31 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
+      TABLE_NAME: {
+        Ref: 'Products'
+      }
+    },
+    iam: {
+      role: {
+        statements: [{
+          Effect: "Allow",
+          Action: [
+            "s3:*",
+            "cloudwatch:*",
+            "dynamodb:DescribeTable",
+            "dynamodb:Query",
+            "dynamodb:Scan",
+            "dynamodb:GetItem",
+            "dynamodb:PutItem",
+            "dynamodb:UpdateItem",
+            "dynamodb:DeleteItem",
+          ],
+          Resource: "arn:aws:dynamodb:eu-central-1:*:table/Products",
+        }],
+      },
     },
   },
-  // import the function via paths
-  functions: { getProductsList, getProduct },
+  functions: { getAllProducts, getProduct, createProduct },
   package: { individually: true },
   custom: {
     esbuild: {
@@ -35,7 +54,37 @@ const serverlessConfiguration: AWS = {
       platform: 'node',
       concurrency: 10,
     },
+    dynamodb: {
+      start: {
+        port: 5000,
+        inMemory: true,
+        migrate: true,
+      },
+      stages: "dev"
+    }
   },
+  resources: {
+    Resources: {
+      Products: {
+        Type: "AWS::DynamoDB::Table",
+        Properties: {
+          TableName: "Products",
+          AttributeDefinitions: [{
+            AttributeName: "productId",
+            AttributeType: "S",
+          }],
+          KeySchema: [{
+            AttributeName: "productId",
+            KeyType: "HASH"
+          }],
+          ProvisionedThroughput: {
+            ReadCapacityUnits: 1,
+            WriteCapacityUnits: 1
+          },
+        }
+      }
+    }
+  }
 };
 
 module.exports = serverlessConfiguration;
