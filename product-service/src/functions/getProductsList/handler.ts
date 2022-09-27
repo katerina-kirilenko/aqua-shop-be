@@ -1,11 +1,22 @@
-import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
-import { formatJSONResponse } from '@libs/api-gateway';
+import { APIGatewayProxyResult } from "aws-lambda";
+import { formatJSONResponse } from "@libs/api-gateway";
+import validator from "@middy/validator";
+import { middyfy } from "@libs/lambda";
+import { outputSchema } from "@models/schema";
+import { productService } from "../../serviсes";
 
-import schema from './schema';
-import { getAllProducts } from "@functions/products";
+export const getAllProducts = async (): Promise<APIGatewayProxyResult> => {
+    try {
+        const products = await productService.getAllProducts();
+        console.log('[db.scan] products', products);
 
-const getProductsList: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async () => {
-    return formatJSONResponse(getAllProducts());
+        return formatJSONResponse(200, products);
+    } catch (e) {
+        console.error('Error during database request executing', e);
+        return formatJSONResponse(500, e);
+    }
 };
 
-export const main = getProductsList;
+export const main = middyfy(getAllProducts).use(
+  validator({ outputSchema })
+);

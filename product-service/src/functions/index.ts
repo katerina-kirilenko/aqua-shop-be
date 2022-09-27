@@ -1,2 +1,3 @@
-export { default as getProductsList } from './getProductsList';
-export { default as getProduct } from './getProductsById';
+export { getAllProducts } from './getProductsList';
+export { getProduct } from './getProductsById';
+export { createProduct } from './createProduct';
