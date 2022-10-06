@@ -1,5 +1,5 @@
 import type { AWS } from '@serverless/typescript';
-import { importProductsFile } from '@functions/index';
+import { importProductsFile, importFileParser } from '@functions/index';
 
 const importBucket = 'aquashop-import-service';
 
@@ -38,7 +38,7 @@ const serverlessConfiguration: AWS = {
       },
     },
   },
-  functions: { importProductsFile },
+  functions: { importProductsFile, importFileParser },
   resources: {
     Resources: {
       SvgUploadBucket: {

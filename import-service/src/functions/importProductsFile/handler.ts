@@ -1,7 +1,7 @@
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
-import { v4 as uuid } from "uuid";
-import * as AWS from "aws-sdk";
+import { v4 as uuid } from 'uuid';
+import * as AWS from 'aws-sdk';
 
 const s3 = new AWS.S3({ region: 'eu-central-1' });
 
@@ -9,7 +9,7 @@ const importProductsFile = async (event) => {
   console.log('Start lambda importProductsFile');
   try {
     const id = uuid();
-    const file = `${event.queryStringParameters.name}`;
+    const file = event.queryStringParameters.name;
     const fileName = `${file.split('.')[0]}-${id}`;
     console.log('File: ', fileName);
 
