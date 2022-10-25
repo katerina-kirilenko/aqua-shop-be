@@ -1,8 +1,6 @@
 import type { AWS } from '@serverless/typescript';
 import { importProductsFile, importFileParser } from '@functions/index';
 
-const importBucket = 'aquashop-import-service';
-
 const serverlessConfiguration: AWS = {
   service: 'import-service',
   frameworkVersion: '3',
@@ -19,7 +17,12 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
-      BUCKET_NAME: { Ref: 'SvgUploadBucket' },
+      UPLOAD_BUCKET: 'aquashop-import-bucket',
+      BUCKET_REF: { Ref: 'AquashopImportBucket' },
+      SQS_REF: { Ref: 'catalogItemsQueue' },
+      SQS_NAME: 'catalogItemsQueue',
+      SQS_ARN:
+        'arn:aws:sqs:eu-central-1:083525352146:catalogItemsQueue',
     },
     iam: {
       role: {
@@ -27,13 +30,18 @@ const serverlessConfiguration: AWS = {
           {
             Effect: 'Allow',
             Action: 's3:ListBucket',
-            Resource: `arn:aws:s3:::${importBucket}`,
+            Resource: 'arn:aws:s3:::${self:provider.environment.UPLOAD_BUCKET}',
           },
           {
             Effect: 'Allow',
             Action: 's3:*',
-            Resource: `arn:aws:s3:::${importBucket}/*`,
-          }
+            Resource: 'arn:aws:s3:::${self:provider.environment.UPLOAD_BUCKET}/*',
+          },
+          {
+            Effect: 'Allow',
+            Action: ['sqs:*'],
+            Resource: '${self:provider.environment.SQS_ARN}',
+          },
         ],
       },
     },
@@ -41,25 +49,25 @@ const serverlessConfiguration: AWS = {
   functions: { importProductsFile, importFileParser },
   resources: {
     Resources: {
-      SvgUploadBucket: {
+      AquashopImportBucket: {
         Type: 'AWS::S3::Bucket',
         Properties: {
-          BucketName: importBucket,
+          BucketName: '${self:provider.environment.UPLOAD_BUCKET}',
           CorsConfiguration: {
             CorsRules: [
               {
+                AllowedOrigins: ['*'],
                 AllowedHeaders: ['*'],
                 AllowedMethods: ['GET', 'PUT', 'POST', 'DELETE'],
-                AllowedOrigins: ['*'],
               },
             ],
           },
         }
       },
-      productsUploadBucketPolicy: {
+      AquashopImportBucketPolicy: {
         Type: 'AWS::S3::BucketPolicy',
         Properties: {
-          Bucket: importBucket,
+          Bucket: '${self:provider.environment.UPLOAD_BUCKET}',
           PolicyDocument: {
             Statement: [
               {
@@ -69,14 +77,33 @@ const serverlessConfiguration: AWS = {
                 },
                 Action: '*',
                 Resource: [
-                  `arn:aws:s3:::${importBucket}`,
-                  `arn:aws:s3:::${importBucket}/*`,
+                  'arn:aws:s3:::${self:provider.environment.UPLOAD_BUCKET}',
+                  'arn:aws:s3:::${self:provider.environment.UPLOAD_BUCKET}/*'
                 ],
               },
             ],
           },
         },
       },
+      catalogItemsQueue: {
+        Type: 'AWS::SQS::Queue',
+        Properties: {
+          QueueName: "${self:provider.environment.SQS_NAME}",
+        },
+      },
+      catalogItemsQueuePolicy: {
+        Type : 'AWS::SQS::QueuePolicy',
+        Properties: {
+          Queues: [{ Ref: 'catalogItemsQueue' }],
+          PolicyDocument: {
+            Statement: [{
+              Action: ['sqs:*'],
+              Effect: 'Allow',
+              Resource: '*',
+            }]
+          }
+        }
+      }
     },
   },
   package: { individually: true },
