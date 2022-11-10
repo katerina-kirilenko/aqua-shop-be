@@ -5,7 +5,7 @@ export const importFileParser =  {
   events: [
     {
       s3: {
-        bucket: 'aquashop-import-service',
+        bucket: '${self:provider.environment.UPLOAD_BUCKET}',
         event: 's3:ObjectCreated:*',
         rules: [
           {

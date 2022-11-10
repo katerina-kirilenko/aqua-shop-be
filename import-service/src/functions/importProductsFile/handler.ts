@@ -14,7 +14,7 @@ const importProductsFile = async (event) => {
     console.log('File: ', fileName);
 
     const signedUrl = s3.getSignedUrl('putObject', {
-      Bucket: 'aquashop-import-service',
+      Bucket: 'aquashop-import-bucket',
       Key: `uploaded/${fileName}.csv`,
       Expires: 60,
       ContentType: 'text/csv',
